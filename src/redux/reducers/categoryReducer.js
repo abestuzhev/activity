@@ -3,6 +3,7 @@ const PUSH_TASK_IN_CATEGORY = "PUSH_TASK_IN_CATEGORY";
 const DELETE_TASK_IN_CATEGORY = "DELETE_TASK_IN_CATEGORY";
 const ADD_COLOR_CATEGORY = "ADD_COLOR_CATEGORY";
 const DELETE_CATEGORY = "DELETE_CATEGORY";
+const ADD_CURRENT_CATEGORY = "ADD_CURRENT_CATEGORY";
 
 const initialState = {
     categories: [
@@ -41,7 +42,7 @@ const initialState = {
         },
         
     ],
-    
+    currentCategory: null
 
 }
 
@@ -69,6 +70,12 @@ const categoryReducer = function (state = initialState, action) {
                     : category 
                 })
             } 
+
+        case ADD_CURRENT_CATEGORY: 
+            return { 
+                ...state, 
+                currentCategory: action.payload
+            }
             
         case DELETE_TASK_IN_CATEGORY: 
             return { 
@@ -88,5 +95,6 @@ export const pushTaskInCategory = (payload) => ({type: PUSH_TASK_IN_CATEGORY, pa
 export const addColorCategory = (payload) => ({type: ADD_COLOR_CATEGORY, payload})
 export const deleteTaskInCategory = (id) => ({type: DELETE_TASK_IN_CATEGORY, id})
 export const deleteCategory = (id) => ({type: DELETE_CATEGORY, id})
+export const addCurrentCategory = (payload) => ({type: ADD_CURRENT_CATEGORY, payload})
 
 export default categoryReducer;

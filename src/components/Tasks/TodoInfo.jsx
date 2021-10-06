@@ -13,24 +13,6 @@ export default function TodoInfo() {
 
     return (
         <>
-        {
-            toggleTaskInfo && 
-            
-            <div className="info">
-                <div className="info-head">
-                    <div className="info-close" onClick={closeTaskInfo}></div>
-                </div>
-                <div className="info-body"></div>
-                <div className="info-block">
-                    {currentTask.id} <br />
-                    {currentTask.text}
-                </div>
-                <div className="info-block"></div>
-                <div className="info-block"></div>
-                <div className="info-block"></div>
-                <div className="info-block"></div>
-            </div>
-        }
         </>
         
     )

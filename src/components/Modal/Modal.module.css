@@ -1,0 +1,106 @@
+/* 
+.Modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 600px;
+    height: 600px;
+    background-color: #000;
+} */
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+.Modal {
+    transition: opacity .15s linear;
+}
+
+.ModalContainer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.ModalWrapper {
+    position: absolute;
+    visibility: hidden;
+    width: 100%;
+    height: 100%;
+    height: 100vh;
+    overflow: hidden;
+    opacity: 0;
+    flex-grow: 1;
+
+    position: static;
+        visibility: visible;
+        opacity: 1;
+        max-height: auto;
+
+    
+}
+
+.ModalOverlay {
+    position: fixed;
+    z-index: 2;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(39,39,39,.5);
+    overflow: scroll;
+    opacity: 1;
+    transition: opacity 200ms cubic-bezier(0.165, 0.84, 0.44, 1) 0s;
+}
+
+.ModalStandart {
+    position: relative;
+    z-index: 10;
+    margin: 0 auto;
+    max-width: 824px;
+    background: #fff;
+    cursor: auto;
+    max-width: 924px;
+    margin-top: 6px;
+    border-radius: 6px;
+    height: 524px;
+}
+
+.ModalStandartHead {
+    padding-top: 40px;
+    padding-left: 32px;
+    margin-bottom: 11px;
+    font-weight: 400;
+    font-size: 21px;
+    line-height: 25px;
+    color: #e3631b;
+    padding-left: 97px;
+    padding-right: 97px;
+    height: 65px;
+}
+
+.ModalStandartBody {
+    padding: 0 32px 40px;
+    height: 375px;
+}
+
+.ModalStandartFooter {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+    position: sticky;
+    bottom: 0;
+    padding: 20px 24px;
+    background: #fff;
+    border-top: 1px solid rgba(0,0,0,.15);
+    display: flex;
+    justify-content: space-between;
+    min-height: 32px;
+    height: 73px;
+}
+
