@@ -6,6 +6,7 @@ const TOGGLE_TASK_INFO = "TOGGLE_TASK_INFO";
 const DELETE_TASK = "DELETE_TASK";
 const CHANGE_TITLE_TASK = "CHANGE_TITLE_TASK";
 const TOGGLE_MODAL = "TOGGLE_MODAL";
+const CHANGE_TITLE_NOTE = "CHANGE_TITLE_NOTE";
 
 const initialState = {
     tasks: [],
@@ -33,7 +34,14 @@ const taskReducer = function (state = initialState, action) {
         }
 
         case ADD_CURRENT_TASK: {
-            return {...state, currentTask: action.payload}
+            return {...state, 
+                
+                tasks: state.tasks.map(item => {
+                    return item.id === action.payload.id
+                    ? {...action.payload}
+                    : item
+                }),
+                currentTask: action.payload}
         }
 
         case CHANGE_TITLE_TASK: {
@@ -55,6 +63,19 @@ const taskReducer = function (state = initialState, action) {
             }
             
         }
+
+        // case TOGGLE_TASK_NOTE: {
+        //     return {
+        //         ...state,
+        //         tasks: state.tasks.map(item => {
+        //             return item.id === action.payload.id
+        //             ? {...item, note: action.payload.note}
+        //             : item
+        //         })
+        //     }
+            
+        // }
+
         case TOGGLE_MODAL: {
             return {
                 ...state,
@@ -81,6 +102,8 @@ export const checkTask = (id) => ({type: CHECK_TASK, id})
 export const deleteTask = (id) => ({type: DELETE_TASK, id})
 
 export const changeTaskTitle = (payload) => ({type: CHANGE_TITLE_TASK, payload})
+
+// export const changeTaskNote = (note) => ({type: CHANGE_TITLE_NOTE, payload: {id, note}})
 export const toggleModal = () => ({type: TOGGLE_MODAL})
 
 export const addCurrentTask = (task) => ({type: ADD_CURRENT_TASK, payload: task})

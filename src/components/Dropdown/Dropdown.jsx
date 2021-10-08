@@ -63,7 +63,7 @@ export default function Dropdown({conf}) {
             
             {
                 toggle && 
-                <div className="c-dropdown" >
+                <div className="c-dropdown" style={{[conf.side]: 'auto'}}>
                     <div className="c-dropdown-body">
                         
                         <div className="c-dropdown-box">

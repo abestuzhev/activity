@@ -79,7 +79,7 @@ const Todo = () => {
                 <div className="frame-head__title">
                     <h2 className="frame-title c-title" style={{backgroundColor: currentCategory.color}}>{currentCategory.name}</h2>
                     <div className="frame-title-menu">
-                        <Dropdown conf = {{width:30, height:30}} />
+                        <Dropdown conf = {{width:30, height:30, side: "left"}} />
                     </div>
                 </div>
                 <div className="frame-title__text">{currentCategory.text}</div>
