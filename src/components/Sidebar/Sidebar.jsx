@@ -30,9 +30,9 @@ export default function Sidebar() {
                     <div className="sidebar-account-user__body">
                         <div className="sidebar-account-user__name">Константин</div>
                     </div>
-                    <div className="sidebar-account-productivity">
+                    <Link to="/history" className="sidebar-account-productivity">
                         <IconProductivitySVG />
-                    </div>
+                    </Link>
                 </div>
                 
             </div>            

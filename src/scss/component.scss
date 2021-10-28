@@ -343,6 +343,8 @@
       line-height: 58px;
       height: 68px;
       color: #333;
+      border: none;
+      outline: none;
     }
   }
 
@@ -376,11 +378,11 @@
         margin-top: -2px;
       }
   
-      // &:focus {
-      //   &::before {
-      //     content: "";
-      //   }
-      // }
+       &:focus {
+         &::before {
+           content: "";
+         }
+       }
     }
 
     

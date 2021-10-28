@@ -13,7 +13,8 @@ const initialState = {
     currentTask: {},
     isLoaded: false,
     count: 0,
-    toggleModal: false
+    toggleModal: false,
+    completedMode: false
 }
 
 const taskReducer = function (state = initialState, action) {
@@ -27,7 +28,7 @@ const taskReducer = function (state = initialState, action) {
                 ...state,
                 tasks: state.tasks.map(item => {
                     return item.id === action.id
-                    ? {...item, complete: !item.complete}
+                    ? {...item, complete: !item.complete, dateEnd: Date.now()}
                     : item
                 })
             }

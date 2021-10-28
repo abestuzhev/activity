@@ -13,10 +13,15 @@ const Todo = () => {
     const [item, setItem] = useState("");
     const dispatch = useDispatch();
     const allTasks = useSelector((state) => state.tasksPage.tasks);
+    const completedMode = useSelector((state) => state.tasksPage.completedMode);
     const allCategories = useSelector((state) => state.sidebar.categories);
     const {idCategory} = useParams();
 
-    const list = allTasks.filter(item => item.category[0] === idCategory);
+    let list = allTasks.filter(item => item.category[0] === idCategory);
+    // if(completedMode) {
+    //     list = list.filter(item => item.complete === false);
+    // }
+
     
     const currentCategoryArray = allCategories.filter(category => category.id === +idCategory);
     const currentCategory = currentCategoryArray[0] || allCategories[0];
@@ -25,7 +30,8 @@ const Todo = () => {
         id: uuidv4(),
         text: item,
         complete: false,
-        date: "", 
+        dateStart: Date.now(),
+        dateEnd: "",
         category: [idCategory || "1"],
         note: "",
         toggleTaskInfo: false,

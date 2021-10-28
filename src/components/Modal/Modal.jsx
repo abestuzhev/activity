@@ -19,11 +19,14 @@ export default function Modal({task}) {
     }
 
     const changeNoteTaskHandler = (value) => {
-        
-        
         // dispatch(changeTaskNote())
         console.log("value", value);
         dispatch(addCurrentTask({...currentTask, note: value}))
+    }
+    const changeTitleTaskHandler = (value) => {
+        // dispatch(changeTaskNote())
+        console.log("value", value);
+        dispatch(addCurrentTask({...currentTask, text: value}))
     }
 
 
@@ -48,7 +51,12 @@ export default function Modal({task}) {
                     >
                         <div className="modal-standart">
                             <div className="modal-head">
-                                <div className="modal-head__title">{currentTask.text}</div>
+                                <div
+                                    className="modal-head__title"
+                                    contentEditable={true}
+                                    suppressContentEditableWarning={true}
+                                    onBlur={e => changeTitleTaskHandler(e.target.textContent)}
+                                >{currentTask.text}</div>
                                 <div className="modal-close">
 
                                 </div>
@@ -57,8 +65,8 @@ export default function Modal({task}) {
                                 <div 
                                     className={currentTask.note !== "" ? "modal-editor" : "modal-editor start-blank"} 
                                     contentEditable={true}
-                                    data-placeholder="Заметки и мысли"
                                     suppressContentEditableWarning={true}
+                                    data-placeholder="Заметки и мысли"
                                     onBlur={e => changeNoteTaskHandler(e.target.textContent)}
                                 >
                                     {currentTask.note}

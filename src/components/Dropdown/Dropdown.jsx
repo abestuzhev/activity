@@ -30,6 +30,8 @@ export default function Dropdown({conf}) {
 
     useEffect(() => {
         document.body.addEventListener("click", handleOutsideClick)
+
+        return document.body.removeEventListener("click", handleOutsideClick)
     }, [])
 
     const dropdownHandler = () => {

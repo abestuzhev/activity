@@ -672,3 +672,37 @@ body,
     }
   }
 }
+
+.history {
+  &-stat {
+    display: flex;
+    margin-left: -10px;
+    margin-right: -10px;
+    &__col {
+      width: 33.333%;
+      padding: 10px;
+    }
+
+    &-card {
+      background-color: #F7F7F7;
+      border-radius: 10px;
+      height: 315px;
+    }
+  }
+
+  &-year {
+    display: flex;
+    flex-flow: row wrap;
+    &__day {
+      width: 11px;
+      height: 11px;
+      margin: 3px;
+      border-radius: 50px;
+      background-color: #ccc;
+      cursor: pointer;
+    }
+  }
+
+
+
+}
