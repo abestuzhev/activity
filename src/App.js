@@ -9,6 +9,7 @@ import Tasks from './components/Tasks/Tasks';
 import History from "./components/History/History";
 
 function App() {
+  console.log("START APP")
   return (
     <>
         <div className="todo">

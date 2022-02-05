@@ -62,7 +62,6 @@ const taskReducer = function (state = initialState, action) {
                     : item
                 })
             }
-            
         }
 
         // case TOGGLE_TASK_NOTE: {
