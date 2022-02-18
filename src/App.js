@@ -8,7 +8,6 @@ import Sidebar from './components/Sidebar/Sidebar';
 import Tasks from './components/Tasks/Tasks';
 import History from "./components/History/History";
 
-console.log("init")
 function App() {
   console.log("START APP")
   return (
