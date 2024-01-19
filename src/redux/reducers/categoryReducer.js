@@ -4,6 +4,8 @@ const DELETE_TASK_IN_CATEGORY = "DELETE_TASK_IN_CATEGORY";
 const ADD_COLOR_CATEGORY = "ADD_COLOR_CATEGORY";
 const DELETE_CATEGORY = "DELETE_CATEGORY";
 const ADD_CURRENT_CATEGORY = "ADD_CURRENT_CATEGORY";
+const GET_CATEGORIES = "GET_CATEGORIES";
+const REMOVE_CATEGORY = "REMOVE_CATEGORY";
 
 const initialState = {
     categories: [
@@ -48,8 +50,13 @@ const initialState = {
 
 const categoryReducer = function (state = initialState, action) {
     switch(action.type){
+        case GET_CATEGORIES: return { ...state, categories: action.payload }
         case ADD_CATEGORY: return { ...state, categories: [...state.categories, action.payload] }
-        case PUSH_TASK_IN_CATEGORY: 
+        case REMOVE_CATEGORY: return {
+            ...state,
+            categories: state.categories.filter(c => c.id !== action.payload)
+        }
+        case PUSH_TASK_IN_CATEGORY:
             return { 
                 ...state, 
                 categories: state.categories.map(category => {
@@ -68,7 +75,8 @@ const categoryReducer = function (state = initialState, action) {
                     return category.id === +action.payload.id
                     ? {...category, color: action.payload.color}
                     : category 
-                })
+                }),
+                currentCategory: state.categories.find(category => category.id === action.payload.id)
             } 
 
         case ADD_CURRENT_CATEGORY: 
@@ -90,7 +98,9 @@ const categoryReducer = function (state = initialState, action) {
     }
 };
 
+export const getCategories = (categories) => ({type: GET_CATEGORIES, payload: categories})
 export const addCategory = (category) => ({type: ADD_CATEGORY, payload: category})
+export const removeCategory = (id) => ({type: REMOVE_CATEGORY, payload: id})
 export const pushTaskInCategory = (payload) => ({type: PUSH_TASK_IN_CATEGORY, payload})
 export const addColorCategory = (payload) => ({type: ADD_COLOR_CATEGORY, payload})
 export const deleteTaskInCategory = (id) => ({type: DELETE_TASK_IN_CATEGORY, id})

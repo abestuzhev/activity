@@ -1,47 +1,53 @@
-import {useEffect, useState} from 'react';
+import {useState} from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory, useParams } from 'react-router';
-import { v4 as uuidv4 } from "uuid";
-import { deleteTaskInCategory, pushTaskInCategory } from '../../redux/reducers/categoryReducer';
-import { addCurrentTask, addTask, checkTask, deleteTask, changeToggleTaskInfo, changeTaskTitle, toggleModal } from '../../redux/reducers/taskReducer';
+import { addTask } from '../../redux/reducers/taskReducer';
 import Dropdown from '../Dropdown/Dropdown';
-import {ReactComponent as IconDeteleSVG} from '../../img/delete.svg';
-import { CSSTransition, TransitionGroup } from 'react-transition-group';
+import moment from 'moment';
+import {canArrayValues} from "../../helpers/helpers";
+import TaskServices from "../../api/services/TaskServices";
+import TodoCard from "./TodoCard";
+import TodoDetail from "./TodoDetail/TodoDetail";
 
 const Todo = () => {
 
     const [item, setItem] = useState("");
     const dispatch = useDispatch();
-    const allTasks = useSelector((state) => state.tasksPage.tasks);
+
+
+    const {user} = useSelector((state) => state.auth);
+    const {tasks, toggleDetail} = useSelector((state) => state.tasksPage);
     const completedMode = useSelector((state) => state.tasksPage.completedMode);
-    const allCategories = useSelector((state) => state.sidebar.categories);
-    const {idCategory} = useParams();
+    const {categories, currentCategory} = useSelector((state) => state.sidebar);
 
-    let list = allTasks.filter(item => item.category[0] === idCategory);
-    // if(completedMode) {
-    //     list = list.filter(item => item.complete === false);
-    // }
+    const listByCategory = canArrayValues(tasks) ? tasks.filter(task => task?.categories?.includes(currentCategory?.id)) : [];
+    let listActiveByCategory = canArrayValues(listByCategory) ? listByCategory.filter(task => !task?.status): []
+    let listCompletedByCategory = canArrayValues(listByCategory) ? listByCategory.filter(task => task?.status): []
 
-    
-    const currentCategoryArray = allCategories.filter(category => category.id === +idCategory);
-    const currentCategory = currentCategoryArray[0] || allCategories[0];
-
-    const newTask = {
-        id: uuidv4(),
-        text: item,
-        complete: false,
-        dateStart: Date.now(),
-        dateEnd: "",
-        category: [idCategory || "1"],
-        note: "",
-        toggleTaskInfo: false,
+    if(currentCategory?.id === 998) {
+        console.log("currentCategory", currentCategory)
+        listActiveByCategory = canArrayValues(tasks) ? tasks.filter(task => !task?.status && task.isImportant): []
+        listCompletedByCategory = canArrayValues(tasks) ? tasks.filter(task => task?.status && task.isImportant): []
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();        
-        dispatch(addTask(newTask))
-        dispatch(pushTaskInCategory(newTask));
-
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        const response = await TaskServices.addTask({
+            // id: uuidv4(),
+            title: item,
+            status: false,
+            start: moment().format("DD.MM.YYYY HH:mm"),
+            end: "",
+            categories: currentCategory?.id !== 1 ? [1, currentCategory?.id] : [currentCategory?.id],
+            text: "",
+            user: user.id
+        })
+        if(response) {
+            console.log("newTask", response)
+            dispatch(addTask({...response,
+                start: moment(response.start).format("DD.MM.YYYY HH:mm"),
+                end: moment(response.end).format("DD.MM.YYYY HH:mm")
+            }))
+        }
         setItem("");
     }
 
@@ -50,139 +56,62 @@ const Todo = () => {
         setItem(e.target.value)
     }
 
-    const checkHandler = (id) => {
-
-        dispatch(checkTask(id))
-        console.log(list);
-    }
-
-    const deleteTaskHandler = (id) => {
-        dispatch(deleteTask(id));
-        dispatch(deleteTaskInCategory(id));
-    }
-
-    const changeTaskHandler = (task) => {
-        //открыть окно и поместить туда нужную информацию
-        dispatch(addCurrentTask(task));
-        // dispatch(changeToggleTaskInfo(task))
-        dispatch(toggleModal())
-        // console.log("changeTaskHandler");
-        // console.log("task", task);
-    }
-
-    const changeTaskTitleHandlet = (item) => {
-        dispatch(changeTaskTitle(item));
-        console.log("changeTaskTitleHandlet", item)
-    }
-
-
     return (
-        <>
-        <div className="frame-area">
-
-        
-            <div className="frame-head">
-                <div className="frame-head__title">
-                    <h2 className="frame-title c-title" style={{backgroundColor: currentCategory.color}}>{currentCategory.name}</h2>
-                    <div className="frame-title-menu">
-                        <Dropdown conf = {{width:30, height:30, side: "left"}} />
+        <div className={'frame-area-grid'}>
+            <div className="frame-area">
+                <div className="frame-head">
+                    <div className="frame-head__title">
+                        <h2 className="frame-title c-title" style={{backgroundColor: currentCategory?.color}}>{currentCategory?.title}</h2>
+                        {
+                            currentCategory?.type === 'user' &&
+                            <div className="frame-title-menu">
+                                <Dropdown currentCategory = {currentCategory} conf = {{width:30, height:30, side: "left"}} />
+                            </div>
+                        }
                     </div>
+                    <div className="frame-title__text">{currentCategory?.text}</div>
                 </div>
-                <div className="frame-title__text">{currentCategory.text}</div>
-            </div>
-            
 
-            {
-                idCategory !== "3" 
-                ? <form onSubmit={handleSubmit} className="frame-form">
+
+                <form onSubmit={handleSubmit} className="frame-form">
                     <div className="frame-add">
                         <div className="frame-add__icon"></div>
                         <input value={item} onChange={handlerSetItem} type="text" placeholder="Добавить задачу"/>
                         {item && <button className="frame-add__btn">Добавить задачу</button>}
                     </div>
                 </form>
-                : ""
-            }
-            
 
-            <div className="frame-list">
-                <TransitionGroup>
+                <div className="frame-list">
+                    {
+                        listActiveByCategory.map(item => {
+                            return (
 
-                {
-                    list.map(item => {
-                        
-                        return (
-                            < CSSTransition
-                            key={item.id}
-                            timeout={100}
-                            classNames="item"
-                            >
-                            <div className="frame-list__item" >                                
-                                <div className={
-                                    item.complete 
-                                    ? item.toggleTaskInfo ? "frame-card complete is-show" : "frame-card complete" 
-                                    : item.toggleTaskInfo ? "frame-card is-show" : "frame-card"} >
-                                    <div className="frame-card__body">
-                                        <div className="frame-card-check">
-                                            <div className="frame-card-check__icon" onClick={() => checkHandler(item.id)}></div>
-                                        </div>
-
-                                        <div 
-                                            className="frame-card__text" 
-                                            onClick={() => changeTaskHandler(item)}
-                                            >
-                                                {item.text}
-                                            </div>
-                                        
-                                        {/* {
-                                            !item.toggleTaskInfo 
-                                            ? <div 
-                                            className="frame-card__text" 
-                                            onClick={() => changeTaskHandler(item)}
-                                            >
-                                                {item.text}
-                                            </div>
-                                            : <div 
-                                            className="frame-card__text" 
-                                            contentEditable={true}
-                                            onChange={(e) => changeTaskTitleHandlet({id: item.id, title: e.target.value})}
-                                            >
-                                                {item.text}
-                                            </div>
-                                        } */}
-                                        
-                                    </div>
-                                    <div className="frame-card-menu">
-                                        <div className="frame-card-menu__list">
-                                            <div className="frame-card-menu__item" onClick={() => deleteTaskHandler(item.id)}><IconDeteleSVG /></div>
-                                        </div>
-                                    </div>
-                                    
-                                    {
-                                        item.toggleTaskInfo &&
-                                        <div className="frame-card-info">
-                                            {/* <div className="info-head">
-                                                <div className="info-close" onClick={closeTaskInfo}></div>
-                                            </div> */}
-                                            <div className="frame-cardinfo__body"></div>
-                                            <div className="frame-card-info-block">
-                                                <div className="frame-card-info-note" contentEditable={true}></div>
-                                                <div className="c-btn">Сохранить</div>
-                                            </div>
-                                        </div>
-                                    }
-                                    
+                                <div className="frame-list__item" >
+                                    <TodoCard item={item}/>
                                 </div>
-                            </div>
-                            </ CSSTransition>
-                        )
-                    })
-                }
-                </TransitionGroup>
-            </div>
-        </div>
 
-        </>
+                            )
+                        })
+                    }
+                </div>
+                {listCompletedByCategory.length > 0 && <div className="frame-list__title">Завершенные</div>}
+                <div className="frame-list">
+                    {
+                        listCompletedByCategory.map(item => {
+                            return (
+
+                                <div className="frame-list__item" >
+                                    <TodoCard item={item}/>
+                                </div>
+
+                            )
+                        })
+                    }
+                </div>
+            </div>
+            {toggleDetail && <TodoDetail />}
+
+        </div>
     );
 };
 

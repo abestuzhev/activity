@@ -1,134 +1,59 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { changeToggleTaskInfo } from '../../redux/reducers/taskReducer';
+import {changeToggleTaskInfo, toggleDetail} from '../../redux/reducers/taskReducer';
 import {ReactComponent as IconProductivitySVG} from '../../img/productivity.svg';
+import {ReactComponent as IconLogoutSVG} from '../../img/logout.svg';
+import {ReactComponent as IconUserSVG} from "../../img/user.svg";
 import { addCurrentCategory } from '../../redux/reducers/categoryReducer';
-import {ReactComponent as IconPlusSVG} from '../../img/plus.svg';
-import { CSSTransition } from 'react-transition-group';
+import {apiLogout} from "../../api/endpoints";
+import {canObjectValues} from "../../helpers/helpers";
+import {setIsAuth} from "../../redux/reducers/authReducer";
+import SidebarCategoryUser from "./SidebarCategoryUser";
+import SidebarCategoryDefault from "./SidebarCategoryDefault";
+import SidebarFooter from "./SidebarFooter";
 
 export default function Sidebar() {
 
     const dispatch = useDispatch();
-    const categories = useSelector(({sidebar}) => sidebar.categories);
-    const currentCategory = useSelector(({sidebar}) => sidebar.currentCategory);
+    const {isAuth, user} = useSelector((state) => state.auth);
 
-    const [showMessage, setShowMessage] = useState(false);
+    const userLogoutHandler = () => {
+        apiLogout()
+        dispatch(setIsAuth(false))
+    }
 
     const clickCategoryHandler = (category) => {
         dispatch(changeToggleTaskInfo(false))
         dispatch(addCurrentCategory(category))
+        dispatch(toggleDetail(false))
     }
-
     
     return (
         <div className="sidebar">
             <div className="sidebar-account">
-                <div className="sidebar-account-user">
-                    <div className="sidebar-account-user__img"></div>
+                <Link to="/" className="sidebar-account-user">
+                    <div className="sidebar-account-user__img"><IconUserSVG /></div>
                     <div className="sidebar-account-user__body">
-                        <div className="sidebar-account-user__name">Константин</div>
+                        <div className="sidebar-account-user__name">{canObjectValues(user) ? user?.username : ""}</div>
                     </div>
-                    <Link to="/history" className="sidebar-account-productivity">
-                        <IconProductivitySVG />
-                    </Link>
-                </div>
-                
+                    <div className="sidebar-account-icons">
+                        <Link to="/history" className="sidebar-account-icons__item">
+                            <IconProductivitySVG />
+                        </Link>
+                        {isAuth && <button className="sidebar-account-icons__item" onClick={userLogoutHandler}><IconLogoutSVG /></button> }
+                    </div>
+
+                </Link>
             </div>            
             <div className="sidebar-category">
-                <div className="sidebar-category-default">
-                    {categories.map(category => {
-                        return (
-                            category.default &&
-                            
-                            <div className="sidebar-category__item" key={category.id}>
-                                <Link 
-                                className={currentCategory && currentCategory.id === category.id ? "sidebar-category-card current" : "sidebar-category-card"} 
-                                to={`/tasks/${category.id}`} 
-                                onClick={() => clickCategoryHandler(category)}>
-                                    <div className="sidebar-category-card__head">
-                                        <div className="sidebar-category-card__title">
-                                            <div className="sidebar-category-card__icon" style={{backgroundColor: category.color}}></div>
-                                            <div className="sidebar-category-card__name" >
-                                                {category.name}
-                                            </div>
-                                        </div>                                    
-                                        <div className="sidebar-category-card__count">{category.tasksId.length === 0 ? "" : category.tasksId.length}</div>
-                                    </div>
-                                    <div className="sidebar-category-card__body">                                    
-                                    </div>                                
-                                </Link>          
-                            </div>
-                        )
-                    })}
-                </div>
-                
-                <div className="sidebar-category-user">
-                    <div className="sidebar-category-user__title">Мои категории</div>
-                    <div className="sidebar-category-user__list">
-                    {categories.map(category => {
-                        return (
-                            !category.default &&                        
-                            <div className="sidebar-category__item" key={category.id}>
-                                <Link 
-                                className={currentCategory && currentCategory.id === category.id ? "sidebar-category-card current" : "sidebar-category-card"} 
-                                to={`/tasks/${category.id}`} 
-                                onClick={() => clickCategoryHandler(category)}>
-                                    <div className="sidebar-category-card__head">
-                                        <div className="sidebar-category-card__title">
-                                            <div className="sidebar-category-card__icon" style={{backgroundColor: category.color}}></div>
-                                            <div className="sidebar-category-card__name" >
-                                                {category.name}
-                                            </div>
-                                        </div>                                    
-                                        <div className="sidebar-category-card__count">{category.tasksId.length === 0 ? "" : category.tasksId.length}</div>
-                                    </div>
-                                    <div className="sidebar-category-card__body">                                    
-                                    </div>                                
-                                </Link>          
-                            </div>
-                        )
-                    })}
+                <SidebarCategoryDefault onClick={clickCategoryHandler} />
+                <SidebarCategoryUser onClick={clickCategoryHandler}/>
+            </div>
+            <SidebarFooter />
 
-                    <div className="sidebar-category-card sidebar-category-add">
-                        <div className="sidebar-category-add__icon"><IconPlusSVG /></div>
-                        <div className="sidebar-category-add__text">Добавить категорию</div>
-                    </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div className="test">
-                <button onClick={() => setShowMessage(!showMessage)}>Новость</button>
-                <CSSTransition
-                in={showMessage}
-                timeout={300}
-                classNames="alert"
-                unmountOnExit
-                >
-                    <div className="test-alert">
-                    Animated alert message
-                    This alert message is being transitioned in and out of the DOM.
-                    </div>
-                    
-                </CSSTransition>
-            </div>
-            <div className="sidebar-footer">
-                <div className="sidebar-footer-list">
-                    <div className="sidebar-footer-list__item">
-                        <a className="c-link" href="https://ncase.me/remember/ru.html">Ящик Лейтнера</a>
-                    </div>
-                    <div className="sidebar-footer-list__item">
-                        <a className="c-link" href="https://en.wikipedia.org/wiki/Time_management#The_Eisenhower_Method">Матрица Эйзенхауэра</a>
-                        <div className="c-note">
-                        Раскидываем эти задачи по 4 квадрантам: "Важное и Срочное", "Важное и Не срочное", "Не важное и Срочное" и "Не важное и не срочное". Так вот задачи, которые оказались у вас в квадранте "Важное и Не срочное", это задачи, выполнение которых принесет вам больше всего счастья и значимости, именно их выполнение двигает вас вперёд
-                        </div>
-                    </div>
-                </div>
-                <div className="sidebar-footer__about">Version 0.0.1 About Activity</div>
-                
-            </div>
+
         </div>
     )
 }

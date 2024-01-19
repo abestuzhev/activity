@@ -1,11 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {ReactComponent as FocusableIconSVG} from '../../img/dots.svg';
 import {ReactComponent as IconCheckSVG} from '../../img/check.svg';
-import { useDispatch } from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import { useParams } from 'react-router';
-import { addColorCategory } from '../../redux/reducers/categoryReducer';
+import {addColorCategory, addCurrentCategory, removeCategory} from '../../redux/reducers/categoryReducer';
+import useOutsideClick from "../../hooks/useOutsideClick";
+import CategoryServices from "../../api/services/CategoryServices";
+import CustomInput from "../../shared/Input";
 
-export default function Dropdown({conf}) {
+export default function Dropdown({conf, currentCategory}) {
 
     
 
@@ -24,37 +27,48 @@ export default function Dropdown({conf}) {
 
     const [toggle, setToggle] = useState(false);
     const [colors, setColors] = useState(colorsState);
-    const dropdownRef = useRef();
-    const {idCategory} = useParams(); 
     const dispatch = useDispatch();
+    const {user} = useSelector((state) => state.auth);
 
-    useEffect(() => {
-        document.body.addEventListener("click", handleOutsideClick)
 
-        return document.body.removeEventListener("click", handleOutsideClick)
-    }, [])
-
+    const dropdownHideHandler = () => {
+       setToggle(false);
+    }
     const dropdownHandler = () => {
-        setToggle(!toggle);
+       setToggle(!toggle);
     }
 
-    const handleOutsideClick = (e) => {
-        if(!e.path.includes(dropdownRef.current)) {
-            setToggle(false);
-        }
-        
-    }    
-
-    const checkColorHandler = (colorItem) => {
+    const checkColorHandler = async (colorItem) => {
         setColors([...colors.map(item => {
-            // debugger
             return item.id === colorItem.id
                     ? {...item, checked: true}
                     : {...item, checked: false}
         })]);
-        
-        dispatch(addColorCategory({id:idCategory, color: colorItem.color}))
-    }    
+        delete currentCategory.user
+        const response = await CategoryServices.updateCategory({...currentCategory, color: colorItem.color})
+        if(response) {
+            dispatch(addColorCategory({id:response.id, color: colorItem.color}))
+            dispatch(addCurrentCategory(response))
+        }
+
+    }
+
+    const renameCurrentCategory = () => {
+        // delete currentCategory.user
+        // const response = await CategoryServices.updateCategory({...currentCategory, color: colorItem.color})
+        // if(response) {
+        //     dispatch(addColorCategory({id:response.id, color: colorItem.color}))
+        //     dispatch(addCurrentCategory(response))
+        // }
+    }
+
+    const removeCurrentCategory = async () => {
+        await CategoryServices.removeCategory(currentCategory.id)
+        dispatch(removeCategory(currentCategory.id))
+        setToggle(false)
+    }
+
+    const dropdownRef = useOutsideClick(dropdownHideHandler);
 
     return (
         <>
@@ -69,25 +83,20 @@ export default function Dropdown({conf}) {
                     <div className="c-dropdown-body">
                         
                         <div className="c-dropdown-box">
-                            <div className="c-dropdown-item">
+                            <div className="c-dropdown-item" onClick={renameCurrentCategory}>
                                 <div className="c-dropdown-item__icon"></div>
-                                <div className="c-dropdown-item__text">Add</div>
+                                <div className="c-dropdown-item__text">Переименовать</div>
                                 <div className="c-dropdown-item__arrow"></div>
                             </div>
-                            <div className="c-dropdown-item">
+                            <div className="c-dropdown-item" onClick={removeCurrentCategory}>
                                 <div className="c-dropdown-item__icon"></div>
-                                <div className="c-dropdown-item__text">Rename</div>
-                                <div className="c-dropdown-item__arrow"></div>
-                            </div>
-                            <div className="c-dropdown-item">
-                                <div className="c-dropdown-item__icon"></div>
-                                <div className="c-dropdown-item__text">Delete</div>
+                                <div className="c-dropdown-item__text">Удалить</div>
                                 <div className="c-dropdown-item__arrow"></div>
                             </div>
                         </div>
                         <div className="c-dropdown-box">
                             <div className="c-dropdown-box__title">
-                                <span>Color</span>
+                                <span>Цвета</span>
                             </div>
                             <div className="c-dropdown-color">
                                 {
